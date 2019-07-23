@@ -14,6 +14,10 @@ namespace game {
         const char* operator[](const unsigned int index) const;
         char* operator[](const unsigned int index);
 
+        void initStandard();
+
+        void print() const;
+
     };
 
 }
