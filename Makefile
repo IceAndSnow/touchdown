@@ -15,4 +15,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ -c -o $@ $^
 
 clean:
-	-rm -r $(BUILD_DIR)
+	-rm -r $(BUILD_DIR) || true
+	-rm Touchdown || true
