@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "game/game.h"
-#include "players/ice_bot.h"
+#include "players/random_bot.h"
 
 int main() {
 
-    players::IceBot player1, player2;
+    players::RandomBot player1, player2;
 
     game::Game touchdown(&player1, &player2);
 

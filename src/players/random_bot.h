@@ -1,13 +1,16 @@
-#ifndef TOUCHDOWN_ICE_BOT_H
-#define TOUCHDOWN_ICE_BOT_H
+#ifndef TOUCHDOWN_RANDOM_BOT_H
+#define TOUCHDOWN_RANDOM_BOT_H
 
 #include "../game/player.h"
 
 namespace players {
 
-    class IceBot : public game::Player {
+    class RandomBot : public game::Player {
 
     public:
+
+        RandomBot();
+        RandomBot(unsigned int seed);
 
         std::string name();
 
@@ -19,4 +22,4 @@ namespace players {
 
 }
 
-#endif //TOUCHDOWN_ICE_BOT_H
+#endif //TOUCHDOWN_RANDOM_BOT_H
