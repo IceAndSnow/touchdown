@@ -7,9 +7,11 @@ namespace players {
 
     class IceBot : public game::Player {
 
-        const bool preferToStart(const game::Board& board);
+        std::string name();
 
-        const game::Move play(const game::Board& board);
+        bool preferToStart(const game::Board& board);
+
+        game::Move play(const game::Board& board);
 
     };
 

@@ -1,6 +1,7 @@
 #ifndef TOUCHDOWN_PLAYER_H
 #define TOUCHDOWN_PLAYER_H
 
+#include <string>
 #include "board.h"
 #include "move.h"
 
@@ -8,9 +9,11 @@ namespace game {
 
     struct Player {
 
-        virtual const bool preferToStart(const Board& board) = 0;
+        virtual std::string name() = 0;
 
-        virtual const Move play(const Board& board) = 0;
+        virtual bool preferToStart(const Board& board) = 0;
+
+        virtual Move play(const Board& board) = 0;
 
     };
 

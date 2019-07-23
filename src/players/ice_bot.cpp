@@ -21,11 +21,15 @@ namespace players {
         return game::Move(0,0,1,1); //Should not happen
     }
 
-    const game::Move IceBot::play(const game::Board &board) {
+    std::string IceBot::name() {
+        return "IceBot v0.1";
+    }
+
+    game::Move IceBot::play(const game::Board &board) {
         return arbitraryValidMove(board);
     }
 
-    const bool IceBot::preferToStart(const game::Board &board) {
+    bool IceBot::preferToStart(const game::Board &board) {
         return true;
     }
 
