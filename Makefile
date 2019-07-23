@@ -1,17 +1,17 @@
 SRC_DIR = ./src
 BUILD_DIR = ./build
 
-sources = $(shell find $(SRC_DIR)/ -name '*.cpp')
-objects = $(sources:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
+SOURCES = $(shell find $(SRC_DIR)/ -name '*.cpp')
+OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 
 run: Touchdown
 	./Touchdown
 
-Touchdown: $(objects) Makefile
-	g++ -o $@ --std=c++11 $(objects)
+Touchdown: $(OBJECTS) Makefile
+	g++ -o $@ -O3 --std=c++11 $(OBJECTS)
 
-$(BUILD_DIR)/%.o : $(SRC_DIR)/%.cpp
-	mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	mkdir -p $(dir $@)
 	g++ -c -o $@ $^
 
 clean:
