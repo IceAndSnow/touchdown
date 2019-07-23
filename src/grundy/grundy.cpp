@@ -157,7 +157,7 @@ namespace grundy {
 
         std::unordered_set<unsigned int> set;
         for(unsigned char x = 0; x < 8; ++x) {
-            for(unsigned char y = 0; y < 7; ++y) {
+            for(unsigned char y = 1; y < 7; ++y) {
                 // Add all grundy numbers achieved by moving the piece on (x,y) to the set.
                 grundyForCell(set, state, x, y);
             }
