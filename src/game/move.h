@@ -1,7 +1,3 @@
-//
-// Created by ask on 7/23/19.
-//
-
 #ifndef TOUCHDOWN_MOVE_H
 #define TOUCHDOWN_MOVE_H
 
@@ -9,12 +5,10 @@
 
 namespace game {
 
-    class Move {
+    struct Move {
 
         unsigned char m_fromX, m_fromY;
         unsigned char m_toX, m_toY;
-
-    public:
 
         Move(unsigned char fromX, unsigned char fromY, unsigned char toX, unsigned char toY);
 

@@ -40,16 +40,14 @@ namespace game {
 
         if(abs(dx) > 1) {
             return false;
-        }
-        if(abs(dx) == 1) {
+        } else if(abs(dx) == 1) {
             if(turn && board[m_toX][m_toY] != 2) {
                 return false;
             }
             if(!turn && board[m_toX][m_toY] != 1) {
                 return false;
             }
-        }
-        if(board[m_toX][m_toY] != 0) {
+        } else if(board[m_toX][m_toY] != 0) {
             return false;
         }
 
