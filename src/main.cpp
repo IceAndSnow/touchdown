@@ -1,30 +1,40 @@
 #include <iostream>
-#include "grundy/grundy.h"
+
+#include "game/game.h"
+#include "players/ice_bot.h"
 
 int main() {
-    grundy::GrundyBoardState state =
-            {
-                {   // Player 1 moves left,
-                    // Player 2 moves right
-                    { 0, 0, 0, 0, 0, 0, 0, 0},
-                    { 0, 2, 0, 0, 0, 0, 1, 0},
-                    { 0, 0, 0, 0, 0, 0, 1, 0},
-                    { 0, 2, 0, 0, 0, 0, 1, 0},
-                    { 0, 0, 0, 0, 0, 0, 0, 0},
-                    { 0, 0, 0, 0, 0, 0, 0, 0},
-                    { 0, 0, 0, 0, 0, 0, 0, 0},
-                    { 0, 0, 0, 0, 0, 0, 0, 0}
-                },
-                true //true: Player 1's turn, false: Player 2's turn
-            };
 
-    std::cout << "The conclusion is based on the assumption, that both players play optimally" << std::endl;
+    players::IceBot player1, player2;
 
-    if(grundy::grundy(state)) {
-        std::cout << "The current player is winning" << std::endl;
-    } else {
-        std::cout << "The game will either end in a tie or the current player loses" << std::endl;
+    game::Game touchdown(&player1, &player2);
+
+    while(true) {
+        game::GameState gameState = touchdown.performNextMove();
+
+        if(gameState.isGameOver()) {
+            break;
+        }
+
     }
+
+    unsigned char winner = touchdown.performNextMove().m_winner;
+
+    std::cout << "The winner is: ";
+
+    if(winner == PLAYER_1) {
+        std::cout << "Player 1" << std::endl;
+    }
+    if(winner == PLAYER_2) {
+        std::cout << "Player 2" << std::endl;
+    }
+    if(winner == INVALID_MOVE_PERFORMED) {
+        std::cout << "Something went wrong" << std::endl;
+    }
+
+    std::cout << "The final board position is: " << std::endl;
+
+    touchdown.performNextMove().m_board.print();
 
     return 0;
 }
