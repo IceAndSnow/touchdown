@@ -54,8 +54,8 @@ namespace players {
 
         for(unsigned char x = 0; x < 8; ++x) {
             for(unsigned char y = 0; y < 8; ++y) {
-                if(abs((char)x - (char)px) <= 1) {
-                    tiles[x][y] = board[x][y];
+                if(x < 3) {
+                    tiles[x][y] = board[(char)px+(char)x-1][y];
                 } else {
                     tiles[x][y] = 0;
                 }
@@ -65,13 +65,6 @@ namespace players {
         grundy::GrundyBoardState state;
         memcpy(state.m_board, tiles, sizeof(tiles));
         state.m_turn = turn;
-
-        game::Board b;
-        for(unsigned char x = 0; x < 8; ++x) {
-            for(unsigned char y = 0; y < 8; ++y) {
-                b[x][y] = tiles[x][y];
-            }
-        }
 
         return grundy::grundy(state);
     }
