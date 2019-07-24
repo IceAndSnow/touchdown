@@ -167,7 +167,7 @@ namespace players {
     }
 
     bool IceBot::preferToStart(const game::Board &board) {
-        return false;
+        return true;
     }
 
 }
