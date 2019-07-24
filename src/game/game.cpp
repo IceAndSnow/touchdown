@@ -108,11 +108,13 @@ namespace game {
     }
 
     GameState Game::performNextMove() {
-        if(calculateWinner(m_board, m_turn) != NOT_YET_DECIDED) {
+        unsigned char winner = calculateWinner(m_board, m_turn);
+        if(winner != NOT_YET_DECIDED) {
             return {
                 m_board,
                 m_turn,
-                calculateWinner(m_board, m_turn)
+                winner,
+                winner == PLAYER_1 ? m_players[0] : m_players[1]
             };
         }
 
@@ -124,17 +126,20 @@ namespace game {
             return {
                     m_board,
                     m_turn,
-                    INVALID_MOVE_PERFORMED
+                    INVALID_MOVE_PERFORMED,
+                    nullptr
             };
         }
         move.performMove(m_board);
 
         m_turn = !m_turn;
 
+        winner = calculateWinner(m_board, m_turn);
         return {
             m_board,
             m_turn,
-            calculateWinner(m_board, m_turn)
+            winner,
+            winner == PLAYER_1 ? m_players[0] : m_players[1]
         };
     }
 

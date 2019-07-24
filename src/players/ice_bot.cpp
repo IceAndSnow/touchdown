@@ -21,7 +21,7 @@ namespace players {
         return game::Move(0,0,1,1); //Should not happen
     }
 
-    std::string IceBot::name() {
+    std::string IceBot::name() const {
         return "IceBot v0.1";
     }
 

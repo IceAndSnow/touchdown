@@ -12,7 +12,7 @@ namespace players {
         srand(seed);
     }
 
-    std::string RandomBot::name() {
+    std::string RandomBot::name() const {
         return "Random Bot v1";
     }
 

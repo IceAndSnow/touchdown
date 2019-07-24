@@ -2,6 +2,7 @@
 #define TOUCHDOWN_GAME_STATE_H
 
 #include "board.h"
+#include "player.h"
 
 #define NOT_YET_DECIDED 0
 #define PLAYER_1 1
@@ -14,9 +15,8 @@ namespace game {
 
         const Board m_board;
         const bool m_turn;   // true: Player 1, false: Player 2
-        const unsigned char m_winner; // 0: not yet decided, 1: Player 1, 2: Player 2, 3: Invalid move performed
-
-    public:
+        const unsigned char m_status; // 0: not yet decided, 1: Player 1, 2: Player 2, 3: Invalid move performed
+        const game::Player* m_winner;
 
         bool isGameOver();
 

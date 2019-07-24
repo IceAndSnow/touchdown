@@ -9,7 +9,7 @@ namespace game {
 
     struct Player {
 
-        virtual std::string name() = 0;
+        virtual std::string name() const = 0;
 
         virtual bool preferToStart(const Board& board) = 0;
 

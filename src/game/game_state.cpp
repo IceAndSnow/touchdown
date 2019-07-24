@@ -4,7 +4,7 @@
 namespace game {
 
     bool GameState::isGameOver() {
-        return m_winner != 0;
+        return m_status != 0;
     }
 
 }

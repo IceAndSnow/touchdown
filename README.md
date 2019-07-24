@@ -23,9 +23,9 @@ This is the case until:
 
 ## Implementing a bot to play in this program
 
-Simply create a class that implements the Player interface.
+Simply create a class that implements the `game::Player` interface.
 
-The `std::string name()` method should return the name of the bot.
+The `std::string name() const` method should return the name of the bot.
 
 The `bool preferToStart(const game::Board& board)` method should return a boolean indicating if the bot wants to start given that the configuration is as the given board.
 The tile-value of 1 on the given board will indicate that the starting player has a pawn there at the beginning of the game.

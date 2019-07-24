@@ -9,32 +9,20 @@ int main() {
 
     game::Game touchdown(&player1, &player2);
 
-    while(true) {
-        game::GameState gameState = touchdown.performNextMove();
+    while(!touchdown.performNextMove().isGameOver()) {  }
 
-        if(gameState.isGameOver()) {
-            break;
-        }
+    game::GameState gameState = touchdown.performNextMove();
 
-    }
-
-    unsigned char winner = touchdown.performNextMove().m_winner;
-
-    std::cout << "The winner is: ";
-
-    if(winner == PLAYER_1) {
-        std::cout << "Player 1" << std::endl;
-    }
-    if(winner == PLAYER_2) {
-        std::cout << "Player 2" << std::endl;
-    }
-    if(winner == INVALID_MOVE_PERFORMED) {
-        std::cout << "Something went wrong" << std::endl;
+    if(gameState.m_status == INVALID_MOVE_PERFORMED) {
+        std::cout << "Player " << (gameState.m_turn ? 1 : 2);
+        std::cout << " tried performing an illegal move!" << std::endl;
+    } else {
+        std::cout << "The winner is: Player " << (int)gameState.m_status << " (" << gameState.m_winner->name() << ")" << std::endl;
     }
 
     std::cout << "The final board position is: " << std::endl;
 
-    touchdown.performNextMove().m_board.print();
+    gameState.m_board.print();
 
     return 0;
 }

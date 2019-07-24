@@ -9,7 +9,7 @@ namespace players {
 
     public:
 
-        std::string name();
+        std::string name() const;
 
         bool preferToStart(const game::Board& board);
 
