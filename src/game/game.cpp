@@ -2,11 +2,26 @@
 
 namespace game {
 
-    Game::Game(game::Player *player1, game::Player *player2) {
-        m_players[0] = player1;
-        m_players[1] = player2;
-        m_turn = true;
+    Game::Game(game::Player *p1, game::Player *p2) {
         m_board.initStandard();
+        m_turn = true;
+        bool p1WantsToStart = p1->preferToStart(m_board);
+        bool p2WantsToStart = p2->preferToStart(m_board);
+        if(p1WantsToStart == p2WantsToStart){
+            if(rand() % 2 == 0) {
+                m_players[0] = p1;
+                m_players[1] = p2;
+            } else {
+                m_players[0] = p2;
+                m_players[1] = p1;
+            }
+        } else if(p1WantsToStart) {
+            m_players[0] = p1;
+            m_players[1] = p2;
+        } else {
+            m_players[0] = p2;
+            m_players[1] = p1;
+        }
     }
 
     void Game::loadBoard(game::Board board) {
