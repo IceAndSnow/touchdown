@@ -7,7 +7,8 @@
 #define NOT_YET_DECIDED 0
 #define PLAYER_1 1
 #define PLAYER_2 2
-#define INVALID_MOVE_PERFORMED 3
+#define TIE 3
+#define INVALID_MOVE_PERFORMED 4
 
 namespace game {
 
@@ -15,7 +16,7 @@ namespace game {
 
         const Board m_board;
         const bool m_turn;   // true: Player 1, false: Player 2
-        const unsigned char m_status; // 0: not yet decided, 1: Player 1 won, 2: Player 2 won, 3: Invalid move performed
+        const unsigned char m_status; // 0: not yet decided, 1: Player 1 won, 2: Player 2 won, 3: Tie, 4: Invalid move performed
         const game::Player* m_winner;
         const game::Player* m_player1;
         const game::Player* m_player2;

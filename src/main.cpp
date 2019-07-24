@@ -29,6 +29,8 @@ int main() {
     if(gameState.m_status == INVALID_MOVE_PERFORMED) {
         std::cout << "Player " << (gameState.m_turn ? 1 : 2);
         std::cout << " tried performing an illegal move!" << std::endl;
+    } else if(gameState.m_status == TIE){
+        std::cout << "The game ended in a tie between Player 1 (" << gameState.m_player1->name() << ") and Player 2 (" << gameState.m_player2->name() << ")" << std::endl;
     } else {
         std::cout << "The winner is: Player " << (int)gameState.m_status << " (" << gameState.m_winner->name() << ")" << std::endl;
     }

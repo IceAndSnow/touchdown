@@ -19,7 +19,7 @@ Player 1 starts by making a move (i.e. moving a single pawn a single tile).
 Then player 2 makes a move, then player 1, then player 2 and so on.
 This is the case until:
  - A player gets a pawn to a tile behind the other players starting line. In this case, the player whose pawn crossed the other players starting line wins.
- - A player has no more valid moves. This results in the player losing the game and the other player winning the game.
+ - A player has no more valid moves on the player's turn. This results in a tie.
 
 ## Implementing a bot to play in this program
 

@@ -114,10 +114,10 @@ namespace game {
             return PLAYER_2;
         }
         if(turn && !hasPlayer1AnyValidMoves(board)) {
-            return PLAYER_2;
+            return TIE;
         }
         if(!turn && !hasPlayer2AnyValidMoves(board)) {
-            return PLAYER_1;
+            return TIE;
         }
         return NOT_YET_DECIDED;
     }
@@ -129,7 +129,7 @@ namespace game {
                 m_board,
                 m_turn,
                 winner,
-                winner == PLAYER_1 ? m_players[0] : m_players[1],
+                winner == PLAYER_1 ? m_players[0] : (winner == PLAYER_2 ? m_players[1] : nullptr),
                 m_players[0],
                 m_players[1]
             };
@@ -156,7 +156,7 @@ namespace game {
             m_board,
             m_turn,
             winner,
-            winner == PLAYER_1 ? m_players[0] : m_players[1],
+            winner == PLAYER_1 ? m_players[0] : (winner == PLAYER_2 ? m_players[1] : nullptr),
             m_players[0],
             m_players[1]
         };
