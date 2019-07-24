@@ -9,9 +9,7 @@ namespace game {
 
     class Game {
 
-        Board m_board;
-        Player* m_players[2];
-        bool m_turn;
+        GameState m_state;
 
     public:
 
@@ -20,6 +18,8 @@ namespace game {
         void loadBoard(Board board);
 
         GameState performNextMove();
+
+        GameState getCurrentState();
 
     };
 

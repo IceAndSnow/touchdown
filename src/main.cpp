@@ -11,6 +11,12 @@ int main() {
 
     game::Game touchdown(&player1, &player2);
 
+    game::GameState initialGameState = touchdown.getCurrentState();
+
+    std::cout << "Player 1 is " << initialGameState.m_player1->name() << " and Player 2 is " << initialGameState.m_player2->name() << std::endl;
+    std::cout << "The board initially looks like this: " << std::endl;
+    initialGameState.m_board.print();
+
     bool gameOver = false;
 
     while(!gameOver) {

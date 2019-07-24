@@ -3,29 +3,31 @@
 namespace game {
 
     Game::Game(game::Player *p1, game::Player *p2) {
-        m_board.initStandard();
-        m_turn = true;
-        bool p1WantsToStart = p1->preferToStart(m_board);
-        bool p2WantsToStart = p2->preferToStart(m_board);
+        m_state.m_board.initStandard();
+        m_state.m_turn = true;
+        m_state.m_winner = nullptr;
+        m_state.m_status = NOT_YET_DECIDED;
+        bool p1WantsToStart = p1->preferToStart(m_state.m_board);
+        bool p2WantsToStart = p2->preferToStart(m_state.m_board);
         if(p1WantsToStart == p2WantsToStart){
             if(rand() % 2 == 0) {
-                m_players[0] = p1;
-                m_players[1] = p2;
+                m_state.m_player1 = p1;
+                m_state.m_player2 = p2;
             } else {
-                m_players[0] = p2;
-                m_players[1] = p1;
+                m_state.m_player1 = p2;
+                m_state.m_player2 = p1;
             }
         } else if(p1WantsToStart) {
-            m_players[0] = p1;
-            m_players[1] = p2;
+            m_state.m_player1 = p1;
+            m_state.m_player2 = p2;
         } else {
-            m_players[0] = p2;
-            m_players[1] = p1;
+            m_state.m_player1 = p2;
+            m_state.m_player2 = p1;
         }
     }
 
     void Game::loadBoard(game::Board board) {
-        m_board = board;
+        m_state.m_board = board;
     }
 
     static Move invertMove(Move move) {
@@ -123,43 +125,33 @@ namespace game {
     }
 
     GameState Game::performNextMove() {
-        unsigned char winner = calculateWinner(m_board, m_turn);
+        if(m_state.isGameOver()) {
+            return m_state;
+        }
+
+        const Move move = m_state.m_turn ?
+                m_state.m_player1->play(m_state.m_board) :
+                invertMove(m_state.m_player2->play(invertBoard(m_state.m_board)));
+
+        if(!move.isValid(m_state.m_board, m_state.m_turn)) {
+            m_state.m_status = INVALID_MOVE_PERFORMED;
+            return m_state;
+        }
+        move.performMove(m_state.m_board);
+
+        m_state.m_turn = !m_state.m_turn;
+
+        unsigned char winner = calculateWinner(m_state.m_board, m_state.m_turn);
         if(winner != NOT_YET_DECIDED) {
-            return {
-                m_board,
-                m_turn,
-                winner,
-                winner == PLAYER_1 ? m_players[0] : (winner == PLAYER_2 ? m_players[1] : nullptr),
-                m_players[0],
-                m_players[1]
-            };
+            m_state.m_status = winner;
+            m_state.m_winner = winner == PLAYER_1 ? m_state.m_player1 :
+                              (winner == PLAYER_2 ? m_state.m_player2 : nullptr);
         }
+        return m_state;
+    }
 
-        const Move move = m_turn ?
-                m_players[0]->play(m_board) :
-                invertMove(m_players[1]->play(invertBoard(m_board)));
-
-        if(!move.isValid(m_board, m_turn)) {
-            return {
-                    m_board,
-                    m_turn,
-                    INVALID_MOVE_PERFORMED,
-                    nullptr
-            };
-        }
-        move.performMove(m_board);
-
-        m_turn = !m_turn;
-
-        winner = calculateWinner(m_board, m_turn);
-        return {
-            m_board,
-            m_turn,
-            winner,
-            winner == PLAYER_1 ? m_players[0] : (winner == PLAYER_2 ? m_players[1] : nullptr),
-            m_players[0],
-            m_players[1]
-        };
+    GameState Game::getCurrentState() {
+        return m_state;
     }
 
 }

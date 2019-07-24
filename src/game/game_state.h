@@ -14,12 +14,14 @@ namespace game {
 
     struct GameState {
 
-        const Board m_board;
-        const bool m_turn;   // true: Player 1, false: Player 2
-        const unsigned char m_status; // 0: not yet decided, 1: Player 1 won, 2: Player 2 won, 3: Tie, 4: Invalid move performed
-        const game::Player* m_winner;
-        const game::Player* m_player1;
-        const game::Player* m_player2;
+        GameState();
+
+        Board m_board;
+        bool m_turn;   // true: Player 1, false: Player 2
+        unsigned char m_status; // 0: not yet decided, 1: Player 1 won, 2: Player 2 won, 3: Tie, 4: Invalid move performed
+        game::Player* m_winner;
+        game::Player* m_player1;
+        game::Player* m_player2;
 
         bool isGameOver();
 
