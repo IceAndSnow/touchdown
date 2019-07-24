@@ -15,8 +15,10 @@ namespace game {
 
         const Board m_board;
         const bool m_turn;   // true: Player 1, false: Player 2
-        const unsigned char m_status; // 0: not yet decided, 1: Player 1, 2: Player 2, 3: Invalid move performed
+        const unsigned char m_status; // 0: not yet decided, 1: Player 1 won, 2: Player 2 won, 3: Invalid move performed
         const game::Player* m_winner;
+        const game::Player* m_player1;
+        const game::Player* m_player2;
 
         bool isGameOver();
 

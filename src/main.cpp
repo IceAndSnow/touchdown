@@ -1,15 +1,28 @@
 #include <iostream>
 
 #include "game/game.h"
+#include "players/ice_bot.h"
 #include "players/random_bot.h"
 
 int main() {
 
-    players::RandomBot player1, player2;
+    players::RandomBot player1;
+    players::IceBot player2;
 
     game::Game touchdown(&player1, &player2);
 
-    while(!touchdown.performNextMove().isGameOver()) {  }
+    bool gameOver = false;
+
+    while(!gameOver) {
+        game::GameState s = touchdown.performNextMove();
+        gameOver = s.isGameOver();
+
+        if(!gameOver) {
+            s.m_board.print();
+
+            std::cout << "Now it is Player " << (s.m_turn ? 1 : 2) << "'s (" << (s.m_turn ? s.m_player1->name() : s.m_player2->name()) << ") turn" << std::endl;
+        }
+    }
 
     game::GameState gameState = touchdown.performNextMove();
 

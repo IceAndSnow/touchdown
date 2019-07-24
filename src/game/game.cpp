@@ -129,7 +129,9 @@ namespace game {
                 m_board,
                 m_turn,
                 winner,
-                winner == PLAYER_1 ? m_players[0] : m_players[1]
+                winner == PLAYER_1 ? m_players[0] : m_players[1],
+                m_players[0],
+                m_players[1]
             };
         }
 
@@ -154,7 +156,9 @@ namespace game {
             m_board,
             m_turn,
             winner,
-            winner == PLAYER_1 ? m_players[0] : m_players[1]
+            winner == PLAYER_1 ? m_players[0] : m_players[1],
+            m_players[0],
+            m_players[1]
         };
     }
 
