@@ -3,13 +3,12 @@
 #include "game/game.h"
 #include "players/ice_bot.h"
 #include "players/random_bot.h"
+#include "score/high_score.h"
 
-int main() {
+static inline void showGame(game::Player* p1, game::Player* p2) {
+    std::cout << std::endl;
 
-    players::RandomBot player1;
-    players::IceBot player2;
-
-    game::Game touchdown(&player1, &player2);
+    game::Game touchdown(p1, p2);
 
     game::GameState initialGameState = touchdown.getCurrentState();
 
@@ -44,6 +43,75 @@ int main() {
     std::cout << "The final board position is: " << std::endl;
 
     gameState.m_board.print();
+}
+
+static inline void watchBotsVersus(std::vector<game::Player*> players) {
+    int input;
+
+    std::cout << std::endl;
+    std::cout << "Choose a bot to play: " << std::endl;
+    for(unsigned int i = 0; i < players.size(); ++i) {
+        std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
+    }
+    std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
+    std::cin >> input;
+    if(0 < input || input <= players.size()) {
+        game::Player* p1 = players[input-1];
+
+        std::cout << std::endl;
+        std::cout << "Choose another bot to play: " << std::endl;
+        for(unsigned int i = 0; i < players.size(); ++i) {
+            std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
+        }
+        std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
+        std::cin >> input;
+        if(0 < input || input <= players.size()) {
+            game::Player* p2 = players[input-1];
+
+            showGame(p1, p2);
+        }
+    }
+}
+
+static inline void gatherStatistics(std::vector<game::Player*> players) {
+    int input;
+
+    std::cout << std::endl;
+    std::cout << "The players/bots in this program are: " << std::endl;
+    for(unsigned int i = 0; i < players.size(); ++i) {
+        std::cout << "\t" << players[i]->name() << std::endl;
+    }
+    std::cout << "Choose how many times each bot plays against every other bot: ";
+    std::cin >> input;
+    std::cout << std::endl;
+
+    score::HighScore highScore;
+
+    highScore.recordTournament(players, (unsigned int)input).print();
+}
+
+int main() {
+
+    players::RandomBot randomBot;
+    players::IceBot iceBot;
+
+    std::vector<game::Player*> players;
+    players.push_back(&randomBot);
+    players.push_back(&iceBot);
+
+    std::cout << "Choose one of the following options:" << std::endl;
+    std::cout << "\t1. Watch 2 bots play against each other" << std::endl;
+    std::cout << "\t2. Gather statistics from all the bots (by playing them against eachother" << std::endl;
+    std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
+
+    int input;
+    std::cin >> input;
+
+    if(input == 1) {
+        watchBotsVersus(players);
+    } else if(input == 2) {
+        gatherStatistics(players);
+    }
 
     return 0;
 }
