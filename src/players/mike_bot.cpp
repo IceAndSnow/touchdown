@@ -3,33 +3,58 @@
 #include <ctime>
 #include <vector>
 #include <assert.h>
+#include <stdio.h>
 
 namespace players {
 
    MikeBot::MikeBot() {
-       srand(time(0));
+      srand(time(0));
    }
 
    MikeBot::MikeBot(unsigned int seed) {
-       srand(seed);
+      srand(seed);
    }
 
    std::string MikeBot::name() const {
-       return "Mike Bot v1";
+      return "Mike Bot v1";
    }
 
    bool MikeBot::preferToStart(const game::Board &board) {
-       return rand() % 2 == 0; // Randomly choose to start or not
+      return rand() % 2 == 0; // Randomly choose to start or not
    }
 
+   std::string MikeMove::toStr() const {
+      char str[6];
+      str[0] = col_from + 'A';
+      str[1] = row_from + '1';
+      str[2] = "x-x" [1+captured];
+      str[3] = col_to + 'A';
+      str[4] = row_to + '1';
+      str[5] = 0;
+
+      return str;
+
+   } // toStr
+
    MikeBoard::MikeBoard(const game::Board &board) {
-      for(unsigned char y = 1; y < 8; ++y) {
+      for(unsigned char y = 0; y < 8; ++y) {
          for(unsigned char x = 0; x < 8; ++x) {
-            m_board[x][y] = board[x][y];
+            m_board[x][y] = ((1+board[x][7-y])%3)-1;
          }
       }
       m_turn = 1;
    } // MikeBoard
+
+   void MikeBoard::print() const {
+      for (int row=7; row>=0; --row) {
+         for (int col=0; col<8; ++col) {
+            printf("%c", "O.X" [1+m_board[col][row]]);
+         }
+         printf("\n");
+      }
+      printf("%c to move.\n", "O.X"[1+m_turn]);
+      printf("hash = 0x%08x.%08x\n", m_hash.m_hi, m_hash.m_lo);
+   } // print
 
    void MikeBoard::makeMove(const MikeMove& _move) {
       MikeMove move(_move);   // Make a temporary copy
@@ -367,6 +392,7 @@ namespace players {
       for (unsigned int i=0; i<100; ++i) {
          playGameToEnd(board);
       }
+      m_results.trim();
 
       // Get the results of the current position.
       return m_results[board.getHash()].getResult();
@@ -379,6 +405,7 @@ namespace players {
       MikeMove  bestMove;
 
       int moveCount = board.getLegalMoves(moveList);
+
       for (int i=0; i<moveCount; ++i) {
          board.makeMove(moveList[i]);
          float val = -search(board);
@@ -390,7 +417,7 @@ namespace players {
          }
       } // end of for
 
-      return game::Move(bestMove.col_from, bestMove.row_from, bestMove.col_to, bestMove.row_to);
+      return game::Move(bestMove.col_from, 7-bestMove.row_from, bestMove.col_to, 7-bestMove.row_to);
    } // play
 
    // Negation operator

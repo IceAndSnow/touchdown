@@ -31,6 +31,7 @@ namespace players {
             return !(*this == rhs);
          }
       private:
+      public: // Debug
          uint32_t m_hi;
          uint32_t m_lo;
    }; // MikeHash
@@ -39,11 +40,14 @@ namespace players {
       public:
          MikeMove() {}
          MikeMove(const game::Move& move);
+         std::string toStr() const;
+
          int col_from;
          int row_from;
          int col_to;
          int row_to;
          int captured;
+
    }; // MikeMove
 
    class MikeBoard {
@@ -56,6 +60,7 @@ namespace players {
          MikeHash getHash() const {return m_hash;}
          MikeHash getHash(const MikeMove& move) const;
          int getTurn() const {return m_turn;}
+         void print() const;
 
       private:
          int m_turn;
@@ -74,11 +79,15 @@ namespace players {
          MikeStats() : m_numWin(0), m_numDraw(0), m_numLoss(0) {}
 
          float getResult() const {
-            float total = m_numWin + m_numDraw + m_numLoss;
+            float total = getTotal();
             if (total)
                return (m_numWin - m_numLoss) / total;
             return 0.0;
          } // getResult
+
+         int getTotal() const {
+            return m_numWin + m_numDraw + m_numLoss;
+         } // getTotal
 
          void update(int result) {
             switch (result) {
@@ -109,6 +118,24 @@ namespace players {
                res = it->second;
             return res;
          } // operator []
+
+         void trim() {
+            auto it = m_map.begin();
+            while (it != m_map.end()) {
+               auto tmp = it;
+               ++it;
+               if (tmp->second.getTotal() <= 1) {
+                  m_map.erase(tmp);
+               }
+            }
+         } // trim
+
+         void print() const {
+            printf("Results contains %ld elements:\n", m_map.size());
+            for (auto it = m_map.begin(); it != m_map.end(); ++it) {
+               printf("%08x.%08x -> %f\n", it->first.m_hi, it->first.m_lo, it->second.getResult());
+            }
+         } // print
 
       private:
          std::map<MikeHash, MikeStats> m_map;
