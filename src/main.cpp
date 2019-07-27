@@ -3,6 +3,7 @@
 #include "game/game.h"
 #include "players/ice_bot.h"
 #include "players/random_bot.h"
+#include "players/mike_bot.h"
 #include "score/high_score.h"
 
 static inline void showGame(game::Player* p1, game::Player* p2) {
@@ -94,10 +95,12 @@ int main() {
 
     players::RandomBot randomBot;
     players::IceBot iceBot;
+    players::MikeBot mikeBot;
 
     std::vector<game::Player*> players;
     players.push_back(&randomBot);
     players.push_back(&iceBot);
+    players.push_back(&mikeBot);
 
     std::cout << "Choose one of the following options:" << std::endl;
     std::cout << "\t1. Watch 2 bots play against each other" << std::endl;
