@@ -13,6 +13,8 @@ namespace score {
         std::string m_player1_name;
         std::string m_player2_name;
         unsigned int m_num_of_moves;
+        unsigned int m_total_millis_player1;
+        unsigned int m_total_millis_player2;
     };
 
 }

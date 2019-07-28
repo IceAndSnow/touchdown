@@ -1,4 +1,6 @@
 #include "high_score.h"
+#include <ctime>
+
 
 namespace score {
 
@@ -32,7 +34,27 @@ namespace score {
 
                     unsigned int numOfMoves = 1;
 
-                    while (!round.performNextMove().isGameOver()) { ++numOfMoves; }
+                    unsigned int player1TotalTime = 0;
+                    unsigned int player2TotalTime = 0;
+
+                    struct timespec sTime, eTime;
+                    clock_gettime(CLOCK_REALTIME, &sTime);
+                    while (!round.performNextMove().isGameOver()) {
+                        clock_gettime(CLOCK_REALTIME, &eTime);
+                        if(eTime.tv_nsec < sTime.tv_nsec) {
+                            eTime.tv_nsec += 1000000000;
+                            eTime.tv_sec -= 1;
+                        }
+                        unsigned int elapsedTime = (eTime.tv_sec - sTime.tv_sec) * 1000000000
+                                                 + (eTime.tv_nsec - sTime.tv_nsec);
+                        if(numOfMoves % 2 == 0) {
+                            player2TotalTime += elapsedTime;
+                        } else {
+                            player1TotalTime += elapsedTime;
+                        }
+                        ++numOfMoves;
+                        clock_gettime(CLOCK_REALTIME, &sTime);
+                    }
 
                     game::GameState endState = round.getCurrentState();
 
@@ -42,7 +64,9 @@ namespace score {
                         endState.m_status,
                         endState.m_player1->name(),
                         endState.m_player2->name(),
-                        numOfMoves
+                        numOfMoves,
+                        player1TotalTime / 1000000,
+                        player2TotalTime / 1000000
                     });
                 }
             }

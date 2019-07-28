@@ -15,6 +15,7 @@ namespace score {
                     entry.m_player1_name,
                     0,
                     0,
+                    0,
                     0
             };
         }
@@ -23,8 +24,20 @@ namespace score {
                     entry.m_player2_name,
                     0,
                     0,
+                    0,
                     0
             };
+        }
+
+        m_player_statistics[entry.m_player1_name].m_total_time += entry.m_total_millis_player1;
+        m_player_statistics[entry.m_player2_name].m_total_time += entry.m_total_millis_player2;
+
+        m_player_statistics[entry.m_player2_name].m_total_moves += entry.m_num_of_moves / 2;
+
+        if(entry.m_num_of_moves % 2 == 0) {
+            m_player_statistics[entry.m_player1_name].m_total_moves += entry.m_num_of_moves / 2;
+        } else {
+            m_player_statistics[entry.m_player1_name].m_total_moves += entry.m_num_of_moves / 2 + 1;
         }
 
         if(entry.m_end_status == PLAYER_1) {
@@ -86,20 +99,23 @@ namespace score {
         std::string tiesHeader = "Ties";
         unsigned int tiesWidth = 10;
 
+        std::string avgTimeHeader = "Avg. Time Spent (ms)";
+        unsigned int avgTimeWidth = 20;
+
 
         std::cout << "Statistics (" << getNumberOfEntries() << " entries):" << std::endl;
-        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + 13; ++i) {
+        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + avgTimeWidth + 16; ++i) {
             std::cout << "=";
         }
         std::cout << std::endl;
-        printf("| %-*s | %-*s | %-*s | %-*s |\n", nameWidth, nameHeader.c_str(), winsWidth, winsHeader.c_str(), lossesWidth, lossesHeader.c_str(), tiesWidth, tiesHeader.c_str());
-        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + 13; ++i) {
+        printf("| %-*s | %-*s | %-*s | %-*s | %-*s |\n", nameWidth, nameHeader.c_str(), winsWidth, winsHeader.c_str(), lossesWidth, lossesHeader.c_str(), tiesWidth, tiesHeader.c_str(), avgTimeWidth, avgTimeHeader.c_str());
+        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + avgTimeWidth + 16; ++i) {
             std::cout << "=";
         }
         std::cout << std::endl;
         for(unsigned int player_index = 0; player_index < playerStatistics.size(); ++player_index) {
             if(player_index != 0) {
-                for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + 13; ++i) {
+                for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + avgTimeWidth + 16; ++i) {
                     std::cout << "-";
                 }
                 std::cout << std::endl;
@@ -108,9 +124,10 @@ namespace score {
             unsigned int wins = playerStatistics[player_index].second.m_wins;
             unsigned int losses = playerStatistics[player_index].second.m_losses;
             unsigned int ties = playerStatistics[player_index].second.m_ties;
-            printf("| %-*s | %-*d | %-*d | %-*d |\n", nameWidth, playerName.c_str(), winsWidth, wins, lossesWidth, losses, tiesWidth, ties);
+            unsigned int avgTime = playerStatistics[player_index].second.m_total_time / playerStatistics[player_index].second.m_total_moves;
+            printf("| %-*s | %-*d | %-*d | %-*d | %-*d |\n", nameWidth, playerName.c_str(), winsWidth, wins, lossesWidth, losses, tiesWidth, ties, avgTimeWidth, avgTime);
         }
-        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + 13; ++i) {
+        for(unsigned int i = 0; i < nameWidth + winsWidth + lossesWidth + tiesWidth + avgTimeWidth + 16; ++i) {
             std::cout << "=";
         }
         std::cout << std::endl;

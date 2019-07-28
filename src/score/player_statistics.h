@@ -11,6 +11,8 @@ namespace score {
         unsigned int m_wins;
         unsigned int m_losses;
         unsigned int m_ties;
+        unsigned int m_total_moves;
+        unsigned int m_total_time;
 
     };
 
