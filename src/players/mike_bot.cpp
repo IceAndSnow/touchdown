@@ -158,106 +158,18 @@ namespace players {
       int firstRow;
       int lastRow;
       if (m_turn > 0) {
-         firstRow = 0;
-         lastRow = 6;
+         firstRow = 1;
+         lastRow = 7;
       }
       else {
-         firstRow = 7;
-         lastRow = 1;
+         firstRow = 6;
+         lastRow = 0;
       }
 
-      // First promotion
-      for (int col=0; col<8; ++col) {
-         if (m_board[col][lastRow] == m_turn) {
-            if (m_board[col][lastRow+m_turn] == 0) {
-               pMove->captured = 0;
-               pMove->col_from = col;
-               pMove->row_from = lastRow;
-               pMove->col_to   = col;
-               pMove->row_to   = lastRow + m_turn;
-               pMove++;
-               numMoves++;
-            }
-            if (col > 0 && m_board[col-1][lastRow+m_turn] == -m_turn) {
-               pMove->captured = -m_turn;
-               pMove->col_from = col;
-               pMove->row_from = lastRow;
-               pMove->col_to   = col - 1;
-               pMove->row_to   = lastRow + m_turn;
-               pMove++;
-               numMoves++;
-            }
-            if (col < 7 && m_board[col+1][lastRow+m_turn] == -m_turn) {
-               pMove->captured = -m_turn;
-               pMove->col_from = col;
-               pMove->row_from = lastRow;
-               pMove->col_to   = col + 1;
-               pMove->row_to   = lastRow + m_turn;
-               pMove++;
-               numMoves++;
-            }
-         }
-      }
-
-      // Then captures from the last row
-      {
-         int row=lastRow;
+      for (int row=firstRow; row!=lastRow; row+=m_turn) {
          for (int col=0; col<8; ++col) {
             if (m_board[col][row] == m_turn) {
-               if (col > 0 && m_board[col-1][row+m_turn] == -m_turn) {
-                  pMove->captured = -m_turn;
-                  pMove->col_from = col;
-                  pMove->row_from = row;
-                  pMove->col_to   = col - 1;
-                  pMove->row_to   = row + m_turn;
-                  pMove++;
-                  numMoves++;
-               }
-               if (col < 7 && m_board[col+1][row+m_turn] == -m_turn) {
-                  pMove->captured = -m_turn;
-                  pMove->col_from = col;
-                  pMove->row_from = row;
-                  pMove->col_to   = col + 1;
-                  pMove->row_to   = row + m_turn;
-                  pMove++;
-                  numMoves++;
-               }
-            }
-         }
-      }
-
-      // Then captures from the first row
-      {
-         int row=firstRow;
-         for (int col=0; col<8; ++col) {
-            if (m_board[col][row] == m_turn) {
-               bool decisive = false;
-               if (col > 0 && m_board[col-1][row+m_turn] == -m_turn) {
-                  pMove->captured = -m_turn;
-                  pMove->col_from = col;
-                  pMove->row_from = row;
-                  pMove->col_to   = col - 1;
-                  pMove->row_to   = row + m_turn;
-                  pMove++;
-                  numMoves++;
-                  if (m_board[col-1][row] == m_turn) {
-                     decisive = true;
-                  }
-               }
-               if (col < 7 && m_board[col+1][row+m_turn] == -m_turn) {
-                  pMove->captured = -m_turn;
-                  pMove->col_from = col;
-                  pMove->row_from = row;
-                  pMove->col_to   = col + 1;
-                  pMove->row_to   = row + m_turn;
-                  pMove++;
-                  numMoves++;
-                  if (m_board[col+1][row] == m_turn) {
-                     decisive = true;
-                  }
-               }
-               if (decisive &&
-                     m_board[col][row+m_turn] == 0) {
+               if (m_board[col][row+m_turn] == 0) {
                   pMove->captured = 0;
                   pMove->col_from = col;
                   pMove->row_from = row;
@@ -266,14 +178,6 @@ namespace players {
                   pMove++;
                   numMoves++;
                }
-            }
-         }
-      }
-
-      // Then captures from elsewhere
-      for (int row=firstRow+m_turn; row!=lastRow; row+=m_turn) {
-         for (int col=0; col<8; ++col) {
-            if (m_board[col][row] == m_turn) {
                if (col > 0 && m_board[col-1][row+m_turn] == -m_turn) {
                   pMove->captured = -m_turn;
                   pMove->col_from = col;
@@ -291,58 +195,6 @@ namespace players {
                   pMove->row_to   = row + m_turn;
                   pMove++;
                   numMoves++;
-               }
-            }
-         }
-      }
-
-      // Then ordinary moves where no opponent is opposing
-      for (int col=0; col<8; ++col) {
-         int row;
-         // Search for piece farthest away
-         for (row=lastRow+m_turn; row!=firstRow-m_turn; row-=m_turn) {
-            if (m_board[col][row])
-               break; // Found a piece
-         }
-         if (row!=firstRow-m_turn // There is a piece
-               && m_board[col][row] == m_turn // It is ours
-               && row!=lastRow) { // We are not promoting (have already taken care of that)
-            for (; row!=firstRow-m_turn; row-=m_turn) {
-               if (m_board[col][row] == m_turn) {
-                  if (m_board[col][row+m_turn] == 0) {
-                     pMove->captured = 0;
-                     pMove->col_from = col;
-                     pMove->row_from = row;
-                     pMove->col_to   = col;
-                     pMove->row_to   = row + m_turn;
-                     pMove++;
-                     numMoves++;
-                  }
-               }
-            }
-         }
-      }
-
-      // Then ordinary moves
-      for (int col=0; col<8; ++col) {
-         int row;
-         // Search for piece farthest away
-         for (row=lastRow+m_turn; row!=firstRow-m_turn; row-=m_turn) {
-            if (m_board[col][row])
-               break; // Found a piece
-         }
-         if (!(row!=firstRow-m_turn && m_board[col][row] == m_turn)) {
-            for (; row!=firstRow-m_turn; row-=m_turn) {
-               if (m_board[col][row] == m_turn) {
-                  if (m_board[col][row+m_turn] == 0) {
-                     pMove->captured = 0;
-                     pMove->col_from = col;
-                     pMove->row_from = row;
-                     pMove->col_to   = col;
-                     pMove->row_to   = row + m_turn;
-                     pMove++;
-                     numMoves++;
-                  }
                }
             }
          }
