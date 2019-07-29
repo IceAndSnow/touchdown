@@ -302,7 +302,7 @@ namespace players {
       MikeMove  bestMove;
 
       // Play a bunch of random games
-      for (unsigned int i=0; i<100; ++i) {
+      for (unsigned int i=0; i<300; ++i) {
          playGameToEnd(board, i);
       }
 

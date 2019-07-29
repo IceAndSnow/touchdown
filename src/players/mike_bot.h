@@ -15,14 +15,6 @@
 
 namespace players {
 
-   static inline uint32_t mikeRand() {
-      uint32_t v1 = rand();
-      uint32_t v2 = rand() << 12;
-      uint32_t v3 = rand() << 24;
-      return v3 + (v2 ^ v1);
-   } // end of mikeRand
-
-
    class MikeHash {
       public:
          MikeHash() : m_me(0), m_you(0) {}
@@ -56,10 +48,8 @@ namespace players {
             float total = getTotal();
             if (total) {
                float res = (m_numWin - m_numLoss) / total;
-               //std::cout << "Stats returning " << res << std::endl;
                return res;
             }
-            //std::cout << "No stats here." << std::endl;
             return 0.0;
          } // getResult
 
@@ -148,11 +138,6 @@ namespace players {
          int m_board[8][8];
          std::vector<MikeMove> m_moveList;
          MikeHash m_hash;
-
-         // These are set in constructor.
-         const MikeHash m_white[8][8];
-         const MikeHash m_black[8][8];
-         const MikeHash m_whiteToMove;
    }; // MikeBoard
 
 
