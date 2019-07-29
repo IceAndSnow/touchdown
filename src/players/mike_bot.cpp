@@ -83,10 +83,15 @@ namespace players {
    void MikeBoard::makeMove(const MikeMove& _move) {
       MikeMove move(_move);   // Make a temporary copy
 
-      uint64_t maskMeFrom  = 1UL << (m_turn > 0 ? (move.row_from*8 + move.col_from)     : ((7-move.row_from)*8 + move.col_from));
-      uint64_t maskMeTo    = 1UL << (m_turn > 0 ? (move.row_to*8 + move.col_to)         : ((7-move.row_to)*8 + move.col_to));
-      uint64_t maskYouFrom = 1UL << (m_turn > 0 ? ((7-move.row_from)*8 + move.col_from) : (move.row_from*8 + move.col_from));
-      uint64_t maskYouTo   = 1UL << (m_turn > 0 ? ((7-move.row_to)*8 + move.col_to)     : (move.row_to*8 + move.col_to));
+      uint64_t maskMeFrom  = 1UL << (move.row_from*8 + move.col_from);
+      uint64_t maskMeTo    = 1UL << (move.row_to*8 + move.col_to);
+      uint64_t maskYouFrom = 1UL << ((7-move.row_from)*8 + move.col_from);
+      uint64_t maskYouTo   = 1UL << ((7-move.row_to)*8 + move.col_to);
+
+      if (m_turn < 0) {
+         std::swap(maskMeFrom, maskYouFrom);
+         std::swap(maskMeTo, maskYouTo);
+      }
 
       move.captured                         = m_board[move.col_to][move.row_to];
       m_board[move.col_to][move.row_to]     = m_board[move.col_from][move.row_from];
@@ -94,6 +99,7 @@ namespace players {
       m_turn = -m_turn;
       m_moveList.push_back(move);
 
+#if 0
       assert ((m_hash.m_me & maskMeFrom) != 0);
       assert ((m_hash.m_me & maskMeTo) == 0);
       assert ((m_hash.m_you & maskYouFrom) == 0);
@@ -102,6 +108,7 @@ namespace players {
       } else {
          assert ((m_hash.m_you & maskYouTo) == 0);
       }
+#endif
 
       m_hash.m_me &= ~maskMeFrom;
       m_hash.m_me |= maskMeTo;
@@ -117,10 +124,15 @@ namespace players {
       MikeMove move(m_moveList.back());
       m_moveList.pop_back();
 
-      uint64_t maskMeFrom  = 1UL << (m_turn < 0 ? (move.row_from*8 + move.col_from)     : ((7-move.row_from)*8 + move.col_from));
-      uint64_t maskMeTo    = 1UL << (m_turn < 0 ? (move.row_to*8 + move.col_to)         : ((7-move.row_to)*8 + move.col_to));
-      uint64_t maskYouFrom = 1UL << (m_turn < 0 ? ((7-move.row_from)*8 + move.col_from) : (move.row_from*8 + move.col_from));
-      uint64_t maskYouTo   = 1UL << (m_turn < 0 ? ((7-move.row_to)*8 + move.col_to)     : (move.row_to*8 + move.col_to));
+      uint64_t maskMeFrom  = 1UL << (move.row_from*8 + move.col_from);
+      uint64_t maskMeTo    = 1UL << (move.row_to*8 + move.col_to);
+      uint64_t maskYouFrom = 1UL << ((7-move.row_from)*8 + move.col_from);
+      uint64_t maskYouTo   = 1UL << ((7-move.row_to)*8 + move.col_to);
+
+      if (m_turn > 0) {
+         std::swap(maskMeFrom, maskYouFrom);
+         std::swap(maskMeTo, maskYouTo);
+      }
 
       m_board[move.col_from][move.row_from] = m_board[move.col_to][move.row_to];
       m_board[move.col_to][move.row_to]     = move.captured;
@@ -128,10 +140,12 @@ namespace players {
 
       std::swap(m_hash.m_me, m_hash.m_you);
 
+#if 0
       assert ((m_hash.m_me & maskMeFrom) == 0);
       assert ((m_hash.m_me & maskMeTo) != 0);
       assert ((m_hash.m_you & maskYouFrom) == 0);
       assert ((m_hash.m_you & maskYouTo) == 0);
+#endif
 
       m_hash.m_me |= maskMeFrom;
       m_hash.m_me &= ~maskMeTo;
