@@ -4,6 +4,14 @@
 #include "../game/player.h"
 #include <vector>
 #include <map>
+#include <iostream>
+
+// This bot works by maintaining a statistics of the outcome from each position.
+// This statistics consists of the number of won, drawn, and lost games from the position.
+// The statistics is populated by playing a nunber of random games, where each move is
+// selected from a probability distribution based on the statistics.
+// This random move selection is performed in the function MikeBot::getRandomMove().
+// The population of the statiscs is done by the function MikeBot::playGameToEnd().
 
 namespace players {
 
@@ -14,65 +22,31 @@ namespace players {
       return v3 + (v2 ^ v1);
    } // end of mikeRand
 
+
    class MikeHash {
       public:
-         MikeHash() : m_hi(mikeRand()), m_lo(mikeRand()) {}
+         MikeHash() : m_me(0), m_you(0) {}
          void update(const MikeHash& rhs) {
-            m_hi ^= rhs.m_hi;
-            m_lo ^= rhs.m_lo;
+            m_me  ^= rhs.m_me;
+            m_you ^= rhs.m_you;
          }
          bool operator==(const MikeHash& rhs) const {
-            return (m_hi == rhs.m_hi && m_lo == rhs.m_lo);
+            return (m_me == rhs.m_me && m_you == rhs.m_you);
          }
          bool operator<(const MikeHash& rhs) const {
-            return (m_hi < rhs.m_hi || (m_hi == rhs.m_hi && m_lo < rhs.m_lo));
+            return (m_me < rhs.m_me || (m_me == rhs.m_me && m_you < rhs.m_you));
          }
          bool operator!=(const MikeHash& rhs) const {
             return !(*this == rhs);
          }
+         friend std::ostream& operator<< (std::ostream& os, const MikeHash& arg);
+         friend class MikeBoard;
+
       private:
-      public: // Debug
-         uint32_t m_hi;
-         uint32_t m_lo;
+         uint64_t m_me;
+         uint64_t m_you;
    }; // MikeHash
 
-   class MikeMove {
-      public:
-         MikeMove() {}
-         MikeMove(const game::Move& move);
-         std::string toStr() const;
-
-         int col_from;
-         int row_from;
-         int col_to;
-         int row_to;
-         int captured;
-
-   }; // MikeMove
-
-   class MikeBoard {
-      public:
-         MikeBoard(const game::Board &board);
-         void makeMove(const MikeMove& move);
-         void undoMove();
-         int isFinished() const;
-         int getLegalMoves(MikeMove *pMove) const;
-         MikeHash getHash() const {return m_hash;}
-         MikeHash getHash(const MikeMove& move) const;
-         int getTurn() const {return m_turn;}
-         void print() const;
-
-      private:
-         int m_turn;
-         int m_board[8][8];
-         std::vector<MikeMove> m_moveList;
-         MikeHash m_hash;
-
-         // These are set in constructor.
-         const MikeHash m_white[8][8];
-         const MikeHash m_black[8][8];
-         const MikeHash m_whiteToMove;
-   }; // MikeBoard
 
    class MikeStats {
       public:
@@ -80,8 +54,12 @@ namespace players {
 
          float getResult() const {
             float total = getTotal();
-            if (total)
-               return (m_numWin - m_numLoss) / total;
+            if (total) {
+               float res = (m_numWin - m_numLoss) / total;
+               //std::cout << "Stats returning " << res << std::endl;
+               return res;
+            }
+            //std::cout << "No stats here." << std::endl;
             return 0.0;
          } // getResult
 
@@ -96,6 +74,8 @@ namespace players {
                case -1 : ++m_numLoss; break;
             }
          } // update
+         friend std::ostream& operator<< (std::ostream& os, const MikeStats& arg);
+         friend MikeStats operator-(const MikeStats& rhs); // Negate
 
       public:
          int m_numWin;
@@ -103,7 +83,6 @@ namespace players {
          int m_numLoss;
    }; // MikeStats
 
-   MikeStats operator-(const MikeStats& rhs);
 
    class MikeResults {
       public:
@@ -119,27 +98,63 @@ namespace players {
             return res;
          } // operator []
 
-         void trim() {
+         void trim(int num) {
             auto it = m_map.begin();
             while (it != m_map.end()) {
                auto tmp = it;
                ++it;
-               if (tmp->second.getTotal() <= 1) {
+               if (tmp->second.getTotal() <= num) {
                   m_map.erase(tmp);
                }
             }
          } // trim
 
-         void print() const {
-            printf("Results contains %ld elements:\n", m_map.size());
-            for (auto it = m_map.begin(); it != m_map.end(); ++it) {
-               printf("%08x.%08x -> %f\n", it->first.m_hi, it->first.m_lo, it->second.getResult());
-            }
-         } // print
+         friend std::ostream& operator<< (std::ostream& os, const MikeResults& arg);
 
       private:
          std::map<MikeHash, MikeStats> m_map;
    }; // MikeResults
+
+
+   class MikeMove {
+      public:
+         MikeMove() {}
+         MikeMove(const game::Move& move);
+         friend std::ostream& operator<< (std::ostream& os, const MikeMove& arg);
+
+         int col_from;
+         int row_from;
+         int col_to;
+         int row_to;
+         int captured;
+
+   }; // MikeMove
+
+
+   class MikeBoard {
+      public:
+         MikeBoard(const game::Board &board);
+         void makeMove(const MikeMove& move);
+         void undoMove();
+         int isFinished() const;
+         int getLegalMoves(MikeMove *pMove) const;
+         MikeHash getHash() const {return m_hash;}
+         MikeHash getHash(const MikeMove& move) const;
+         int getTurn() const {return m_turn;}
+         friend std::ostream& operator<< (std::ostream& os, const MikeBoard& arg);
+
+      private:
+         int m_turn;
+         int m_board[8][8];
+         std::vector<MikeMove> m_moveList;
+         MikeHash m_hash;
+
+         // These are set in constructor.
+         const MikeHash m_white[8][8];
+         const MikeHash m_black[8][8];
+         const MikeHash m_whiteToMove;
+   }; // MikeBoard
+
 
    class MikeBot : public game::Player {
 
@@ -155,10 +170,8 @@ namespace players {
          game::Move play(const game::Board& board);
 
       private:
-         const MikeMove&   getRandomMove(const MikeBoard& board, const MikeMove *moveList, int moveCount) const;
-         int               playGameToEnd(const MikeBoard &startBoard);
-         float             search(       const MikeBoard &board);
-
+         const MikeMove& getRandomMove(const MikeBoard& board, const MikeMove *moveList, int moveCount) const;
+         int             playGameToEnd(const MikeBoard &startBoard, int num);
 
          MikeResults m_results;
    }; // class MikeBot

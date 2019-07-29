@@ -3,106 +3,142 @@
 #include <ctime>
 #include <vector>
 #include <assert.h>
-#include <stdio.h>
+#include <ostream>
+#include <iostream>
+#include <iomanip>
+#include <algorithm>
 
 namespace players {
+   /////////////////////////////////////////////////////////////
+   // Debug output
 
-   MikeBot::MikeBot() {
-      srand(time(0));
-   }
+   std::ostream& operator<< (std::ostream& os, const MikeHash& arg) {
+      return os << std::setw(16) << std::setfill('0') << std::hex << arg.m_me << "."
+                << std::setw(16) << std::setfill('0') << std::hex << arg.m_you << std::dec;
+   } // MikeHash
 
-   MikeBot::MikeBot(unsigned int seed) {
-      srand(seed);
-   }
+   std::ostream& operator<< (std::ostream& os, const MikeStats& arg) {
+      return os << "[+" << arg.m_numWin << " =" << arg.m_numDraw << " -" << arg.m_numLoss << "]";
+   } // MikeStats
 
-   std::string MikeBot::name() const {
-      return "Mike Bot v1";
-   }
+   std::ostream& operator<< (std::ostream& os, const MikeResults& arg) {
+      return os << arg.m_map.size();
+   } // MikeResults
 
-   bool MikeBot::preferToStart(const game::Board &board) {
-      return rand() % 2 == 0; // Randomly choose to start or not
-   }
-
-   std::string MikeMove::toStr() const {
+   std::ostream& operator<< (std::ostream& os, const MikeMove& arg) {
       char str[6];
-      str[0] = col_from + 'A';
-      str[1] = row_from + '1';
-      str[2] = "x-x" [1+captured];
-      str[3] = col_to + 'A';
-      str[4] = row_to + '1';
+      str[0] = arg.col_from + 'A';
+      str[1] = arg.row_from + '1';
+      str[2] = "x-x" [1+arg.captured];
+      str[3] = arg.col_to + 'A';
+      str[4] = arg.row_to + '1';
       str[5] = 0;
 
-      return str;
+      return os << str;
+   } // MikeMove
 
-   } // toStr
+   std::ostream& operator<< (std::ostream& os, const MikeBoard& arg) {
+      for (int row=7; row>=0; --row) {
+         for (int col=0; col<8; ++col) {
+            os << "O.X" [1+arg.m_board[col][row]];
+         }
+         os << std::endl;
+      }
+      os << "O.X"[1+arg.m_turn] << " to move." << std::endl;
+      os << "Hash = " << arg.m_hash << std::endl;
+      return os;
+   } // MikeBoard
+
+
+   /////////////////////////////////////////////////////////////
+   // MikeStats
+
+   // Negation operator
+   MikeStats operator-(const MikeStats& rhs) {
+      MikeStats res;
+      res.m_numWin  = rhs.m_numLoss;
+      res.m_numDraw = rhs.m_numDraw;
+      res.m_numLoss = rhs.m_numWin;
+
+      return res;
+   } // operator-
+
+
+   /////////////////////////////////////////////////////////////
+   // MikeBoard
 
    MikeBoard::MikeBoard(const game::Board &board) {
       for(unsigned char y = 0; y < 8; ++y) {
          for(unsigned char x = 0; x < 8; ++x) {
             m_board[x][y] = ((1+board[x][7-y])%3)-1;
+            switch (m_board[x][y]) {
+               case 1  : m_hash.m_me |= 1UL << (y*8+x); break;
+               case -1 : m_hash.m_you |= 1UL << ((7-y)*8+x); break;
+            } 
          }
       }
       m_turn = 1;
    } // MikeBoard
 
-   void MikeBoard::print() const {
-      for (int row=7; row>=0; --row) {
-         for (int col=0; col<8; ++col) {
-            printf("%c", "O.X" [1+m_board[col][row]]);
-         }
-         printf("\n");
-      }
-      printf("%c to move.\n", "O.X"[1+m_turn]);
-      printf("hash = 0x%08x.%08x\n", m_hash.m_hi, m_hash.m_lo);
-   } // print
-
    void MikeBoard::makeMove(const MikeMove& _move) {
       MikeMove move(_move);   // Make a temporary copy
+
+      uint64_t maskMeFrom  = 1UL << (m_turn > 0 ? (move.row_from*8 + move.col_from)     : ((7-move.row_from)*8 + move.col_from));
+      uint64_t maskMeTo    = 1UL << (m_turn > 0 ? (move.row_to*8 + move.col_to)         : ((7-move.row_to)*8 + move.col_to));
+      uint64_t maskYouFrom = 1UL << (m_turn > 0 ? ((7-move.row_from)*8 + move.col_from) : (move.row_from*8 + move.col_from));
+      uint64_t maskYouTo   = 1UL << (m_turn > 0 ? ((7-move.row_to)*8 + move.col_to)     : (move.row_to*8 + move.col_to));
+
       move.captured                         = m_board[move.col_to][move.row_to];
       m_board[move.col_to][move.row_to]     = m_board[move.col_from][move.row_from];
       m_board[move.col_from][move.row_from] = 0;
       m_turn = -m_turn;
       m_moveList.push_back(move);
 
-      m_hash.update(m_whiteToMove);
-      if (m_turn == -1) {
-         m_hash.update(m_white[move.col_from][move.row_from]);
-         m_hash.update(m_white[move.col_to][move.row_to]);
-         if (move.captured) {
-            m_hash.update(m_black[move.col_to][move.row_to]);
-         }
+      assert ((m_hash.m_me & maskMeFrom) != 0);
+      assert ((m_hash.m_me & maskMeTo) == 0);
+      assert ((m_hash.m_you & maskYouFrom) == 0);
+      if (move.captured) {
+         assert ((m_hash.m_you & maskYouTo) != 0);
       } else {
-         m_hash.update(m_black[move.col_from][move.row_from]);
-         m_hash.update(m_black[move.col_to][move.row_to]);
-         if (move.captured) {
-            m_hash.update(m_white[move.col_to][move.row_to]);
-         }
+         assert ((m_hash.m_you & maskYouTo) == 0);
       }
+
+      m_hash.m_me &= ~maskMeFrom;
+      m_hash.m_me |= maskMeTo;
+      if (move.captured) {
+         m_hash.m_you &= ~maskYouTo;
+      }
+
+      std::swap(m_hash.m_me, m_hash.m_you);
    } // makeMove
 
    void MikeBoard::undoMove() {
       assert(m_moveList.size() > 0);
-
       MikeMove move(m_moveList.back());
       m_moveList.pop_back();
+
+      uint64_t maskMeFrom  = 1UL << (m_turn < 0 ? (move.row_from*8 + move.col_from)     : ((7-move.row_from)*8 + move.col_from));
+      uint64_t maskMeTo    = 1UL << (m_turn < 0 ? (move.row_to*8 + move.col_to)         : ((7-move.row_to)*8 + move.col_to));
+      uint64_t maskYouFrom = 1UL << (m_turn < 0 ? ((7-move.row_from)*8 + move.col_from) : (move.row_from*8 + move.col_from));
+      uint64_t maskYouTo   = 1UL << (m_turn < 0 ? ((7-move.row_to)*8 + move.col_to)     : (move.row_to*8 + move.col_to));
+
       m_board[move.col_from][move.row_from] = m_board[move.col_to][move.row_to];
       m_board[move.col_to][move.row_to]     = move.captured;
       m_turn = -m_turn;
 
-      m_hash.update(m_whiteToMove);
-      if (m_turn == 1) {
-         m_hash.update(m_white[move.col_from][move.row_from]);
-         m_hash.update(m_white[move.col_to][move.row_to]);
-         if (move.captured) {
-            m_hash.update(m_black[move.col_to][move.row_to]);
-         }
-      } else {
-         m_hash.update(m_black[move.col_from][move.row_from]);
-         m_hash.update(m_black[move.col_to][move.row_to]);
-         if (move.captured) {
-            m_hash.update(m_white[move.col_to][move.row_to]);
-         }
+      std::swap(m_hash.m_me, m_hash.m_you);
+
+      assert ((m_hash.m_me & maskMeFrom) == 0);
+      assert ((m_hash.m_me & maskMeTo) != 0);
+      assert ((m_hash.m_you & maskYouFrom) == 0);
+      assert ((m_hash.m_you & maskYouTo) == 0);
+
+      m_hash.m_me |= maskMeFrom;
+      m_hash.m_me &= ~maskMeTo;
+      if (move.captured) {
+         m_hash.m_you |= maskYouTo;
       }
+
    } // undoMove
 
    int MikeBoard::isFinished() const {
@@ -318,18 +354,39 @@ namespace players {
    MikeHash MikeBoard::getHash(const MikeMove& move) const {
       MikeBoard *pBoard = (MikeBoard *) this;
       pBoard->makeMove(move);
-      MikeHash res = pBoard->getHash();
+      MikeHash res(pBoard->getHash());
       pBoard->undoMove();
       return res;
    } // getHash
 
+
+   /////////////////////////////////////////////////////////////
+   // MikeBot
+
+   MikeBot::MikeBot() {
+      srand(time(0));
+   }
+
+   MikeBot::MikeBot(unsigned int seed) {
+      srand(seed);
+   }
+
+   std::string MikeBot::name() const {
+      return "Mike Bot v1";
+   }
+
+   bool MikeBot::preferToStart(const game::Board &board) {
+      return rand() % 2 == 0; // Randomly choose to start or not
+   }
+
+   // Select a random move using a probability distribution based on the result statistics.
    const MikeMove& MikeBot::getRandomMove(const MikeBoard& board, const MikeMove *moveList, int moveCount) const {
       float probs[48];
       float probTot = 0.0;
 
       for (int i=0; i<moveCount; ++i) {
-         float val = -m_results[board.getHash(moveList[i])].getResult();
-         float prob = (1.05 + val) / (1.05 - val);
+         MikeStats stats = -m_results[board.getHash(moveList[i])];
+         float prob = stats.m_numWin + 10.0;
          probTot += prob;
          probs[i] = prob;
       }
@@ -348,9 +405,8 @@ namespace players {
       assert(false);
    } // getRandomMove
 
-
    // This plays a single game to the end, making random moves for both sides.
-   int MikeBot::playGameToEnd(const MikeBoard &startBoard) {
+   int MikeBot::playGameToEnd(const MikeBoard &startBoard, int num) {
       MikeBoard    board(startBoard);     // make temporary copy.
       int          res;                   // result to return.
       MikeHash     hash(board.getHash()); // current hash.
@@ -387,48 +443,35 @@ namespace players {
       return res;
    } // playGameToEnd
 
-   float MikeBot::search(const MikeBoard& board) {
-      // Play a bunch of random games
-      for (unsigned int i=0; i<100; ++i) {
-         playGameToEnd(board);
-      }
-      m_results.trim();
-
-      // Get the results of the current position.
-      return m_results[board.getHash()].getResult();
-   } // search
-
    game::Move MikeBot::play(const game::Board &startBoard) {
       MikeBoard board(startBoard);     // current board
       MikeMove  moveList[48];
       float     bestVal = -2.0;
       MikeMove  bestMove;
 
-      int moveCount = board.getLegalMoves(moveList);
+      // Play a bunch of random games
+      for (unsigned int i=0; i<100; ++i) {
+         playGameToEnd(board, i);
+      }
 
+      int moveCount = board.getLegalMoves(moveList);
       for (int i=0; i<moveCount; ++i) {
          board.makeMove(moveList[i]);
-         float val = -search(board);
+         MikeStats stats = -m_results[board.getHash()];
+         float val = stats.getResult();
          board.undoMove();
 
-         if (val > bestVal) {
+         if (val > bestVal || (val == bestVal && (rand() % 2) == 0)) {
             bestVal = val;
             bestMove = moveList[i];
          }
       } // end of for
 
+      // Delete seldom used entries in the map, to make the map much smaller, and thereby faster.
+      m_results.trim(10);
+
       return game::Move(bestMove.col_from, 7-bestMove.row_from, bestMove.col_to, 7-bestMove.row_to);
    } // play
-
-   // Negation operator
-   MikeStats operator-(const MikeStats& rhs) {
-      MikeStats res;
-      res.m_numWin  = rhs.m_numLoss;
-      res.m_numDraw = rhs.m_numDraw;
-      res.m_numLoss = rhs.m_numWin;
-
-      return res;
-   } // operator-
 
 } // namespace players
 
