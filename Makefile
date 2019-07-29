@@ -9,13 +9,13 @@ run: Touchdown
 	./Touchdown
 
 Touchdown: $(OBJECTS) Makefile
-	g++ -o $@ -O3 --std=c++11 $(OBJECTS)
+	g++ -o $@ --std=c++11 $(OBJECTS)
 
 -include $(DEPENDENCIES)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(dir $@)
-	g++ -MMD -c -o $@ $<
+	g++ -MMD -c -O3 -o $@ $<
 
 clean:
 	-rm -r $(BUILD_DIR) || true
