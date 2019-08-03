@@ -14,6 +14,7 @@ namespace score {
 
         void clear();
         void print();
+        void eprint();
         void addEntry(const StatisticsEntry entry);
 
     private:

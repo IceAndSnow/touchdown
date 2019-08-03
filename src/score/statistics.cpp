@@ -1,4 +1,5 @@
 #include "statistics.h"
+#include "../options.h"
 #include "../game/game.h"
 #include <iostream>
 #include <algorithm>
@@ -131,6 +132,22 @@ namespace score {
             std::cout << "=";
         }
         std::cout << std::endl;
+    }
+
+
+    void Statistics::eprint() {
+        std::vector<std::pair<std::string, PlayerStatistics>> playerStatistics = getPlayerNames();
+
+        EXP_PRINT(getNumberOfEntries());
+
+        for(unsigned int player_index = 0; player_index < playerStatistics.size(); ++player_index) {
+            std::string playerName = playerStatistics[player_index].first;
+            unsigned int wins = playerStatistics[player_index].second.m_wins;
+            unsigned int losses = playerStatistics[player_index].second.m_losses;
+            unsigned int ties = playerStatistics[player_index].second.m_ties;
+            unsigned int avgTime = playerStatistics[player_index].second.m_total_time / playerStatistics[player_index].second.m_total_moves;
+            EXP_PRINT(";" << playerName << ";" << wins << ";" << losses << ";" << ties << ";" << avgTime);
+        }
     }
 
 }

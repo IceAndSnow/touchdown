@@ -8,6 +8,8 @@
 #include "score/high_score.h"
 #include <string.h>
 
+bool explicitMode = false;
+
 static inline void explicitlyPrintBoard(const game::Board& b) {
     for(unsigned int y = 0; y < 8; ++y) {
         for(unsigned int x = 0; x < 8; ++x) {
@@ -108,7 +110,9 @@ static inline void gatherStatistics(std::vector<game::Player*> players) {
 
     score::HighScore highScore;
 
-    highScore.recordTournament(players, (unsigned int)input).print();
+    score::Statistics stats = highScore.recordTournament(players, (unsigned int)input);
+    stats.print();
+    stats.eprint();
 }
 
 static inline void showAvailableBots(std::vector<game::Player*> players) {
@@ -117,12 +121,10 @@ static inline void showAvailableBots(std::vector<game::Player*> players) {
     std::cout << "Available bots:" << std::endl;
     for(unsigned int i = 0; i < players.size(); ++i) {
         std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
-        if(explicitMode) {
-            if(i != players.size()-1) {
-                EXP_PRINT(players[i]->name() << std::endl);
-            } else {
-                EXP_PRINT(players[i]->name());
-            }
+        if(i != players.size()-1) {
+            EXP_PRINT(players[i]->name() << std::endl);
+        } else {
+            EXP_PRINT(players[i]->name());
         }
     }
 }
