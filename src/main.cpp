@@ -129,6 +129,52 @@ static inline void showAvailableBots(std::vector<game::Player*> players) {
     }
 }
 
+static inline bool doesVectorContain(const std::vector<game::Player*> ve, game::Player* va) {
+    for(unsigned int i = 0; i < ve.size(); ++i) {
+        if(ve[i] == va) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static inline std::vector<game::Player*> getSelectedPlayers(std::vector<game::Player*> players) {
+    std::vector<game::Player*> selectedPlayers;
+    while(true) {
+        std::cout << "So far the following bots are selected:" << std::endl;
+        if(selectedPlayers.size() != 0) {
+            std::cout << selectedPlayers[0]->name();
+        }
+        for(int i = 1; i < selectedPlayers.size(); ++i) {
+            if(i == selectedPlayers.size() - 1) {
+                std::cout << " and ";
+            } else {
+                std::cout << ", ";
+            }
+            std::cout << selectedPlayers[i]->name();
+        }
+        std::cout << std::endl;
+        std::cout << "Please select one of the following bots by the corresponding number or type 0 to not select more bots:" << std::endl;
+        for(unsigned int i = 0; i < players.size(); ++i) {
+            if(!doesVectorContain(selectedPlayers, players[i])) {
+                std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
+            }
+        }
+        int input;
+        std::cin >> input;
+        if(input == 0) {
+            break;
+        } else if(input < 0 || input > players.size()) {
+            std::cout << "The given input (" << input << ") is not valid" << std::endl;
+        } else if(doesVectorContain(selectedPlayers, players[input-1])) {
+            std::cout << "That bot is already selected" << std::endl;
+        } else {
+            selectedPlayers.push_back(players[input-1]);
+        }
+    }
+    return selectedPlayers;
+}
+
 int main(int argc, char **argv) {
 
     explicitMode = false;
@@ -149,8 +195,9 @@ int main(int argc, char **argv) {
 
     std::cout << "Choose one of the following options:" << std::endl;
     std::cout << "\t1. Watch 2 bots play against each other" << std::endl;
-    std::cout << "\t2. Gather statistics from all the bots (by playing them against eachother" << std::endl;
+    std::cout << "\t2. Gather statistics from all the bots (by playing them against eachother)" << std::endl;
     std::cout << "\t3. Show available bots" << std::endl;
+    std::cout << "\t4. Gather statistics from some of the bots (by playing them against eachother)" << std::endl;
     std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
 
     int input;
@@ -162,6 +209,9 @@ int main(int argc, char **argv) {
         gatherStatistics(players);
     } else if(input == 3) {
         showAvailableBots(players);
+    } else if(input == 4) {
+        std::vector<game::Player*> selectedPlayers = getSelectedPlayers(players);
+        gatherStatistics(selectedPlayers);
     }
 
     return 0;
