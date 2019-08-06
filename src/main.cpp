@@ -68,29 +68,28 @@ static inline void showGame(game::Player* p1, game::Player* p2) {
     gameState.m_board.print();
 }
 
-static inline void watchBotsVersus(std::vector<game::Player*> players) {
+static game::Player* selectBot(
+        const std::vector<game::Player*> players,
+        const std::string initialRequest) {
     int input;
-
     std::cout << std::endl;
-    std::cout << "Choose a bot to play: " << std::endl;
+    std::cout << initialRequest << std::endl;
     for(unsigned int i = 0; i < players.size(); ++i) {
         std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
     }
     std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
     std::cin >> input;
     if(0 < input || input <= players.size()) {
-        game::Player* p1 = players[input-1];
+        return players[input-1];
+    }
+    return nullptr;
+}
 
-        std::cout << std::endl;
-        std::cout << "Choose another bot to play: " << std::endl;
-        for(unsigned int i = 0; i < players.size(); ++i) {
-            std::cout << "\t" << (i+1) << ". " << players[i]->name() << std::endl;
-        }
-        std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
-        std::cin >> input;
-        if(0 < input || input <= players.size()) {
-            game::Player* p2 = players[input-1];
-
+static inline void watchBotsVersus(std::vector<game::Player*> players) {
+    game::Player* p1 = selectBot(players, "Choose a bot to play: ");
+    if(p1 != nullptr) {
+        game::Player* p2 = selectBot(players, "Choose another bot to play: ");
+        if(p2 != nullptr) {
             showGame(p1, p2);
         }
     }
@@ -175,8 +174,79 @@ static inline std::vector<game::Player*> getSelectedPlayers(std::vector<game::Pl
     return selectedPlayers;
 }
 
-int main(int argc, char **argv) {
+static inline game::Board getBoardFromInput() {
 
+    std::cout << "Now enter a board configuration. The standard initial board would be entered like below:" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << "0 2 0 0 0 0 1 0" << std::endl;
+    std::cout << std::endl;
+
+    game::Board result;
+
+    int input;
+    for(unsigned char x = 0; x < 8; ++x) {
+        for(unsigned char y = 0; y < 8; ++y) {
+            std::cin >> input;
+            if(input < 0 || input > 2) {
+                std::cout << "Invalid input " << input << ". Please re-enter starting from this tile (" << x << ", " << y << ")." << std::endl;
+                --y;
+                continue;
+            } else {
+                result[x][y] = input;
+            }
+        }
+    }
+    return result;
+}
+
+static inline void seeBotMove(std::vector<game::Player*> players) {
+    game::Player* bot = selectBot(players, "Choose the bot: ");
+    if(bot != nullptr) {
+        game::Board board = getBoardFromInput();
+
+        game::Game touchdown(bot, bot);
+        touchdown.loadBoard(board);
+
+        unsigned int activePlayer = 0;
+        while(activePlayer != 1 && activePlayer != 2) {
+            std::cout << "Now choose what player (1 or 2) the bot is: ";
+            std::cin >> activePlayer;
+        }
+
+        touchdown.setActivePlayer(activePlayer);
+        std::cout << "After the bots move the board now looks like this: " << std::endl;
+        game::GameState gameState = touchdown.performNextMove();
+        gameState.m_board.print();
+        explicitlyPrintBoard(gameState.m_board);
+        if(gameState.isGameOver()) {
+            std::cout << "The bot's move ended the game. Assuming that the game was not already over before this move." << std::endl;
+            if(gameState.m_status == INVALID_MOVE_PERFORMED) {
+                std::cout << "Player " << (gameState.m_turn ? 1 : 2);
+                std::cout << " tried performing an illegal move!" << std::endl;
+                EXP_PRINT(";" << (gameState.m_turn ? 1 : 2) << ";INVALID_MOVE");
+            } else if(gameState.m_status == TIE){
+                std::cout << "The game ended in a tie" << std::endl;
+                EXP_PRINT(";0;TIE");
+            } else {
+                std::cout << "The winner is: Player " << (int)gameState.m_status << " (" << gameState.m_winner->name() << ")" << std::endl;
+                EXP_PRINT(";" << (int)gameState.m_status << ";WINNER");
+            }
+        } else {
+            std::cout << "The bot's move did not end the game." << std::endl;
+            EXP_PRINT(";0;NOT_YET_DECIDED");
+        }
+
+        std::cout << "Notice that the outcome may vary as some bots are not deterministic." << std::endl;
+    }
+}
+
+int main(int argc, char **argv) {
     explicitMode = false;
     for(unsigned int i = 0; i < argc; ++i) {
         if(strcmp("-e", argv[i]) == 0) { //Explicit mode
@@ -198,6 +268,7 @@ int main(int argc, char **argv) {
     std::cout << "\t2. Gather statistics from all the bots (by playing them against eachother)" << std::endl;
     std::cout << "\t3. Show available bots" << std::endl;
     std::cout << "\t4. Gather statistics from some of the bots (by playing them against eachother)" << std::endl;
+    std::cout << "\t5. See what move a bot will perform on a specific board configuration" << std::endl;
     std::cout << "If none of the above options are chosen then the program will exit" << std::endl;
 
     int input;
@@ -212,6 +283,8 @@ int main(int argc, char **argv) {
     } else if(input == 4) {
         std::vector<game::Player*> selectedPlayers = getSelectedPlayers(players);
         gatherStatistics(selectedPlayers);
+    } else if(input == 5) {
+        seeBotMove(players);
     }
 
     return 0;

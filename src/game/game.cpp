@@ -154,4 +154,8 @@ namespace game {
         return m_state;
     }
 
+    void Game::setActivePlayer(unsigned int player) {
+        m_state.m_turn = player == 1;
+    }
+
 }

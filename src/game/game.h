@@ -21,6 +21,8 @@ namespace game {
 
         GameState getCurrentState();
 
+        void setActivePlayer(unsigned int player);
+
     };
 
 }
