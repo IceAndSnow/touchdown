@@ -3,7 +3,6 @@
 #include <vector>
 #include <string.h>
 #include <iostream>
-#include "../grundy/grundy.h"
 
 namespace players {
 
@@ -26,8 +25,6 @@ namespace players {
         return game::Move(0,0,1,1); //Should not happen
     }
 
-    typedef std::pair<unsigned char, unsigned char> pos;
-
     static std::vector<pos> getOwnPawnsSorted(const game::Board& board) {
         std::vector<pos> result;
         for(unsigned char y = 1; y < 7; ++y) {
@@ -40,7 +37,7 @@ namespace players {
         return result;
     }
 
-    static unsigned int partialGrundy(const game::Board& board, bool turn, pos p) {
+    unsigned int IceBot::partialGrundy(const game::Board& board, bool turn, pos p) {
         unsigned char &px = p.first;
         unsigned char &py = p.second;
         char tiles[8][8];
@@ -66,10 +63,10 @@ namespace players {
         memcpy(state.m_board, tiles, sizeof(tiles));
         state.m_turn = turn;
 
-        return grundy::grundy(state);
+        return m_grundy.grundy(state);
     }
 
-    static game::Move getOptimalPartialGrundyMove(game::Board board, pos p) {
+    game::Move IceBot::getOptimalPartialGrundyMove(game::Board board, pos p) {
 
         unsigned char &x = p.first;
         unsigned char &y = p.second;
@@ -138,7 +135,7 @@ namespace players {
         return game::Move(-1, -1, -1, -1);
     }
 
-    static game::Move partialGrundyAlgorithm(const game::Board& board) {
+    game::Move IceBot::partialGrundyAlgorithm(const game::Board& board) {
         std::vector<pos> positions = getOwnPawnsSorted(board);
         for(pos& p : positions) {
             if(partialGrundy(board, true, p) != 0) {

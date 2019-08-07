@@ -2,6 +2,7 @@
 #define TOUCHDOWN_GRUNDY_H
 
 #include <unordered_set>
+#include <unordered_map>
 
 namespace grundy {
 
@@ -21,9 +22,20 @@ namespace grundy {
 
     };
 
-    unsigned int mex(const std::unordered_set<unsigned int> set);
+    class Grundy {
 
-    unsigned int grundy(GrundyBoardState& state);
+        std::unordered_map<GrundyBoardState, unsigned int, GrundyBoardStateHasher> memo;
+
+        unsigned int grundyNoMemo(GrundyBoardState& state);
+        unsigned int grundyForCell(std::unordered_set<unsigned int>& set, GrundyBoardState& state, const unsigned char x, const unsigned char y);
+
+    public:
+
+        unsigned int mex(const std::unordered_set<unsigned int> set);
+
+        unsigned int grundy(GrundyBoardState& state);
+
+    };
 
 }
 

@@ -1,10 +1,7 @@
 #include "grundy.h"
 #include <iostream>
-#include <unordered_map>
 
 namespace grundy {
-
-    static std::unordered_map<GrundyBoardState, unsigned int, GrundyBoardStateHasher> memo;
 
     bool GrundyBoardState::operator==(const grundy::GrundyBoardState &b) const {
         for(unsigned char x = 0; x < 8; ++x) {
@@ -26,7 +23,7 @@ namespace grundy {
         return hash ^ b.m_turn;
     }
 
-    unsigned int mex(const std::unordered_set<unsigned int> set) {
+    unsigned int Grundy::mex(const std::unordered_set<unsigned int> set) {
         for(unsigned int i = 0; i < set.size(); ++i) {
             if(set.find(i) == set.end()) {
                 return i;
@@ -35,7 +32,7 @@ namespace grundy {
         return set.size();
     }
 
-    inline static unsigned int grundyForCell(
+    inline unsigned int Grundy::grundyForCell(
             std::unordered_set<unsigned int>& set,
             GrundyBoardState& state,
             const unsigned char x,
@@ -138,7 +135,7 @@ namespace grundy {
         return false;
     }
 
-    static inline unsigned int grundyNoMemo(GrundyBoardState& state) {
+    inline unsigned int Grundy::grundyNoMemo(GrundyBoardState& state) {
         if(state.m_turn) {
             // Since it is currently Player 1's turn,
             // if Player 2 has won, then the grundy number
@@ -168,7 +165,7 @@ namespace grundy {
         return mex(set);
     }
 
-    unsigned int grundy(GrundyBoardState& state) {
+    unsigned int Grundy::grundy(GrundyBoardState& state) {
         //Dynamic Programming, as many states otherwise would be calculated many times
         auto it = memo.find(state);
         if(it != memo.end()) {
