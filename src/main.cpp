@@ -25,7 +25,14 @@ static inline void explicitlyPrintBoard(const game::Board& b) {
 static inline void showGame(players::PlayerInstantiator* p1, players::PlayerInstantiator* p2) {
     std::cout << std::endl;
 
-    game::Game touchdown(p1->createNewPlayer(), p2->createNewPlayer());
+    game::Player* bot1 = p1->createNewPlayer();
+    game::Player* bot2 = nullptr;
+    if(p1 == p2) {
+        bot2 = bot1;
+    } else {
+        bot2 = p2->createNewPlayer();
+    }
+    game::Game touchdown(bot1, bot2);
 
     game::GameState initialGameState = touchdown.getCurrentState();
 

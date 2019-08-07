@@ -30,8 +30,10 @@ namespace players {
         }
 
         virtual void cleanUp() {
-            delete m_player;
-            m_player = nullptr;
+            if(m_player != nullptr) {
+                delete m_player;
+                m_player = nullptr;
+            }
         };
 
     };
