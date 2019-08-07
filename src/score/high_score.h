@@ -2,6 +2,7 @@
 #define TOUCHDOWN_HIGH_SCORE_H
 
 #include "../game/game.h"
+#include "../players/player_instantiator.h"
 #include "statistics.h"
 #include <vector>
 
@@ -11,8 +12,8 @@ namespace score {
 
         Statistics m_statistics;
 
-        Statistics recordTournament(std::vector<game::Player*> players, unsigned int botVsBotTimes = 10);
-        Statistics recordTournament(std::vector<game::Player*> players, game::Board board, unsigned int botVsBotTimes = 10);
+        Statistics recordTournament(std::vector<players::PlayerInstantiator*> playerGens, unsigned int botVsBotTimes = 10);
+        Statistics recordTournament(std::vector<players::PlayerInstantiator*> playerGens, game::Board board, unsigned int botVsBotTimes = 10);
 
         void resetStatistics();
         void printStatistics();

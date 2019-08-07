@@ -12,24 +12,24 @@ namespace score {
         m_statistics.clear();
     }
 
-    Statistics HighScore::recordTournament(std::vector<game::Player *> players, unsigned int botVsBotTimes) {
+    Statistics HighScore::recordTournament(std::vector<players::PlayerInstantiator*> playerGens, unsigned int botVsBotTimes) {
         game::Board defaultBoard;
         defaultBoard.initStandard();
-        return recordTournament(players, defaultBoard, botVsBotTimes);
+        return recordTournament(playerGens, defaultBoard, botVsBotTimes);
     }
 
-    Statistics HighScore::recordTournament(std::vector<game::Player *> players, game::Board board, unsigned int botVsBotTimes) {
-        for(unsigned int b1 = 0; b1 < players.size(); ++b1) {
-            if(players[b1] == nullptr) {
+    Statistics HighScore::recordTournament(std::vector<players::PlayerInstantiator*> playerGens, game::Board board, unsigned int botVsBotTimes) {
+        for(unsigned int b1 = 0; b1 < playerGens.size(); ++b1) {
+            if(playerGens[b1] == nullptr) {
                 continue;
             }
-            for(unsigned int b2 = b1+1; b2 < players.size(); ++b2) {
-                if(players[b2] == nullptr) {
+            for(unsigned int b2 = b1+1; b2 < playerGens.size(); ++b2) {
+                if(playerGens[b2] == nullptr) {
                     continue;
                 }
 
                 for(unsigned int i = 0; i < botVsBotTimes; ++i) {
-                    game::Game round(players[b1], players[b2]);
+                    game::Game round(playerGens[b1]->createNewPlayer(), playerGens[b2]->createNewPlayer());
                     round.loadBoard(board);
 
                     unsigned int numOfMoves = 1;
@@ -68,6 +68,8 @@ namespace score {
                         player1TotalTime / 1000000,
                         player2TotalTime / 1000000
                     });
+                    playerGens[b1]->cleanUp();
+                    playerGens[b2]->cleanUp();
                 }
             }
         }
