@@ -4,6 +4,7 @@
 #include "game/game.h"
 #include "players/generic_instantiator.h"
 #include "players/ice_bot.h"
+#include "players/ice_smash_bot.h"
 #include "players/random_bot.h"
 #include "players/mike_bot.h"
 #include "score/high_score.h"
@@ -271,11 +272,13 @@ int main(int argc, char **argv) {
     auto randomBotGen = players::GenericInstantiator<players::RandomBot>();
     auto iceBotGen = players::GenericInstantiator<players::IceBot>();
     auto mikeBotGen = players::GenericInstantiator<players::MikeBot>();
+    auto iceSmashBotGen = players::GenericInstantiator<players::IceSmashBot>();
 
     std::vector<players::PlayerInstantiator*> playerGens;
     playerGens.push_back(&randomBotGen);
     playerGens.push_back(&iceBotGen);
     playerGens.push_back(&mikeBotGen);
+    playerGens.push_back(&iceSmashBotGen);
 
     std::cout << "Choose one of the following options:" << std::endl;
     std::cout << "\t1. Watch 2 bots play against each other" << std::endl;
