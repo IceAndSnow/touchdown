@@ -5,11 +5,6 @@
 namespace players {
 
     RandomBot::RandomBot() {
-        srand(time(0));
-    }
-
-    RandomBot::RandomBot(unsigned int seed) {
-        srand(seed);
     }
 
     std::string RandomBot::name() const {

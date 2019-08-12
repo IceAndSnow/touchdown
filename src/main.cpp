@@ -270,6 +270,8 @@ int main(int argc, char **argv) {
         }
     }
 
+    srand(time(0));
+
     auto randomBotGen = players::GenericInstantiator<players::RandomBot>();
     auto iceBotGen = players::GenericInstantiator<players::IceBot>();
     auto mikeBotGen = players::GenericInstantiator<players::MikeBot>();

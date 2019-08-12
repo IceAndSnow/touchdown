@@ -39,11 +39,6 @@ namespace players {
    // MikeBot
 
    MikeBot::MikeBot() {
-      srand(time(0));
-   }
-
-   MikeBot::MikeBot(unsigned int seed) {
-      srand(seed);
    }
 
    std::string MikeBot::name() const {

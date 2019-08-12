@@ -17,7 +17,6 @@ namespace players {
       public:
 
          MikeGodBot();
-         MikeGodBot(unsigned int seed);
 
          std::string name() const;
 
