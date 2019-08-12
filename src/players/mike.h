@@ -26,6 +26,7 @@ namespace players {
          }
          friend std::ostream& operator<< (std::ostream& os, const MikeHash& arg);
          friend class MikeBoard;
+         friend class MikeGodBotV2;
 
       private:
          uint64_t m_me;
