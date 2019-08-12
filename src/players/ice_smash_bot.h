@@ -11,8 +11,6 @@ namespace players {
 
     class IceSmashBot : public game::Player {
 
-        std::default_random_engine m_randEngine;
-
         std::vector<game::Move> getAllValidMoves(const game::Board& board) const;
         std::vector<IceSmashScore> getAllScores(const game::Board& board, const std::vector<game::Move> moves) const;
         IceSmashScore getScoreIfMove(const game::Board& board, const game::Move move) const;
@@ -22,7 +20,6 @@ namespace players {
     public:
 
         IceSmashBot();
-        IceSmashBot(unsigned int seed);
 
         std::string name() const;
 

@@ -10,7 +10,6 @@ namespace players {
     public:
 
         RandomBot();
-        RandomBot(unsigned int seed);
 
         std::string name() const;
 

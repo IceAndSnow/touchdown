@@ -5,13 +5,6 @@
 namespace players {
 
     IceSmashBot::IceSmashBot() {
-        auto timeStamp = std::chrono::system_clock::now();
-        auto seed = std::chrono::system_clock::to_time_t(timeStamp);
-        m_randEngine.seed(seed);
-    }
-
-    IceSmashBot::IceSmashBot(unsigned int seed) {
-        m_randEngine.seed(seed);
     }
 
     std::string IceSmashBot::name() const {
@@ -19,8 +12,7 @@ namespace players {
     }
 
     bool IceSmashBot::preferToStart(const game::Board& board) {
-        auto randNum = std::uniform_int_distribution<int>(1,2)(m_randEngine);
-        return randNum % 2 == 0;
+        return rand() % 2 == 0;
     }
 
     bool sortByScoreDescending(const IceSmashScore& a, const IceSmashScore& b) {
@@ -38,7 +30,7 @@ namespace players {
                 break;
             }
         }
-        auto randNum = std::uniform_int_distribution<int>(0, numOfBestMoves-1)(m_randEngine);
+        auto randNum = rand() % numOfBestMoves;
         return allScores[randNum].second;
     }
 

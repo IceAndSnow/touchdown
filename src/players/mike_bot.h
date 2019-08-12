@@ -87,7 +87,6 @@ namespace players {
       public:
 
          MikeBot();
-         MikeBot(unsigned int seed);
 
          std::string name() const;
 
