@@ -6,6 +6,7 @@
 #include "players/ice_bot.h"
 #include "players/ice_smash_bot.h"
 #include "players/random_bot.h"
+#include "players/rumle_meal_bot.h"
 #include "players/mike_bot.h"
 #include "players/mike_god_bot.h"
 #include "players/mike_god_bot_v2.h"
@@ -279,6 +280,7 @@ int main(int argc, char **argv) {
     auto iceSmashBotGen = players::GenericInstantiator<players::IceSmashBot>();
     auto mikeGodBotGen = players::GenericInstantiator<players::MikeGodBot>();
     auto mikeGodBotV2Gen = players::GenericInstantiator<players::MikeGodBotV2>();
+    auto rumleMEALBotGen = players::GenericInstantiator<players::RumleMEALBot>();
 
     std::vector<players::PlayerInstantiator*> playerGens;
     playerGens.push_back(&randomBotGen);
@@ -287,6 +289,7 @@ int main(int argc, char **argv) {
     playerGens.push_back(&iceSmashBotGen);
     playerGens.push_back(&mikeGodBotGen);
     playerGens.push_back(&mikeGodBotV2Gen);
+    playerGens.push_back(&rumleMEALBotGen);
 
     std::cout << "Choose one of the following options:" << std::endl;
     std::cout << "\t1. Watch 2 bots play against each other" << std::endl;
